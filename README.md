@@ -1,17 +1,21 @@
-
-for each database, the following tables are being created:
-DATABASECHANGELOG
-DATABASECHANGELOGLOCK
-
-How the <includeAll> tag runs in a changelog
-All files inside of the included directory are run in alphabetical order.
-https://docs.liquibase.com/concepts/advanced/includeall.html
-If you choose to use the <includeAll> tag, make sure you have a naming strategy in place to ensure that you will never have conflicts or need to rename files to force a reordering.
-
-kubectl logs myapp-pod -c liquibas
-kubectl exec -it $(kubectl get pods | grep postgres | cut -f 1 -d' ') bash
-kubectl exec -it $(kubectl get pods | grep postgres | cut -f 1 -d' ') -- psql -h localhost -p 5432 -d quarkus -U quarkus -c "select * from person"
-kubectl exec -it $(kubectl get pods | grep postgres | cut -f 1 -d' ') -- psql -h localhost -p 5432 -d quarkus -U quarkus -c "drop table person"
-kubectl exec -it $(kubectl get pods | grep postgres | cut -f 1 -d' ') -- psql -h localhost -p 5432 -d quarkus -U quarkus -c "drop table DATABASECHANGELOG"
-kubectl exec -it $(kubectl get pods | grep postgres | cut -f 1 -d' ') -- psql -h localhost -p 5432 -d quarkus -U quarkus -c "drop table DATABASECHANGELOGLOCK"
 # Liquibase-kubernetes
+This is an example of application deployement with liquibase as initContainers on kubernetes cluster.  
+Its essential to deploy liquibase as initContainers, in order to make sure kubernetes does not kill the process, and that the process has its all prerequisite database changes.  
+steps:  
+1. install kubernetes (minikube kubectl)
+2. deploy postgres : kubectl apply -f postgresql-deployment.yaml
+3. deploy changelogs:  kubectl apply -f liquibase-changelog-v1.yaml.  
+4.                     kubectl apply -f liquibase-changelog-v2.yaml
+5. deploy application with liquibase as initContainers: kubectl apply -f init_container_pod.yaml (as of now, need to change manually the changelog version 1/2)
+scripts:
+### 1. drop_tables.sh (should be executed before retest):
+ delete the sample table, people and liquibase tables: DATABASECHANGELOG and DATABASECHANGELOGLOCK.
+
+### 2. read_tables.sh
+select from people table and liquibase tables: DATABASECHANGELOG and DATABASECHANGELOGLOCK.
+
+WIP: 
+- support multiple changelog files (includeAll)
+- rollback
+- use secret password
+
