@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  containers:
+    - name: myapp-container
+      image: busybox:1.28
+      command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+  initContainers:
+    - name: liquibase
+      image: piomin/liquibase
+      env:
+       - name: URL
+         value: jdbc:postgresql://postgres:5432/quarkus
+       - name: USERNAME
+         value: quarkus
+       - name: PASSWORD
+         value: admin123
+       - name: CHANGELOGFILE
+         value: changelog.sql
+      volumeMounts:
+       - name: config-vol
+         mountPath: /liquibase/changelog
+  volumes:
+   - name: config-vol
+     configMap:
+       name: liquibase-changelog-v1
