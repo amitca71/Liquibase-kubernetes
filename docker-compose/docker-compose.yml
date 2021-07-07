@@ -1,0 +1,30 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+ 
+  liquibase:
+    image: liquibase/liquibase
+    depends_on:
+      - db
+    volumes:
+      - ${PWD}/changelog:/liquibase/changelog 
+    command:
+      "./liquibase --defaultsFile=/liquibase/changelog/liquibase.properties --classpath=/liquibase/changelog/ update"
+volumes:
+  changelog:
