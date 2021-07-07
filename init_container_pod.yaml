@@ -11,7 +11,7 @@ spec:
       command: ['sh', '-c', 'echo The app is running! && sleep 3600']
   initContainers:
     - name: liquibase
-      image: piomin/liquibase
+      image: amitca71/liquibase:stable
       env:
        - name: URL
          value: jdbc:postgresql://postgres:5432/quarkus
@@ -27,4 +27,4 @@ spec:
   volumes:
    - name: config-vol
      configMap:
-       name: liquibase-changelog-v1
+       name: liquibase-changelog-v2
